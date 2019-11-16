@@ -21,12 +21,14 @@ const schemas = {
       .required(),
     avatar: Joi.string()
       .min(4)
-      .max(64),
+      .max(64)
+      .allow(""),
 
     about: Joi.string()
       .alphanum()
       .min(2)
-      .max(150),
+      .max(150)
+      .allow(""),
     email: Joi.string()
       .email({
         minDomainSegments: 2

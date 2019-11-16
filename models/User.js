@@ -74,8 +74,12 @@ UserSchema.methods.toJSON = function() {
 };
 
 UserSchema.methods.comparePassword = async function(candidatePassword, cb) {
-  const isMatch = await bcrypt.compare(candidatePassword, hash);
-  next(isMatch);
+  try {
+    const isMatch = await bcrypt.compare(candidatePassword, this.password);
+    return null, isMatch;
+  } catch (error) {
+    cb(isMatch);
+  }
 };
 
 UserSchema.pre("save", async function(next) {

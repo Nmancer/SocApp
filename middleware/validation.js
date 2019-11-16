@@ -1,5 +1,6 @@
 const validationMiddleware = (schema, property) => {
   return (req, res, next) => {
+    console.log(req.body);
     const { error } = schema.validate(req.body);
     const valid = error == null;
     if (valid) {

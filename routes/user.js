@@ -9,7 +9,7 @@ const {
   followUser
 } = require("../controllers").UserController;
 
-const { loginSchema } = require("../utils/schemas");
+const { loginSchema, registrationSchema } = require("../utils/schemas");
 const validateMiddleware = require("../middleware/validation");
 // const { celebrate } = require("celebrate");
 
@@ -25,7 +25,7 @@ router.get(
   getSingleUser
 );
 router.post("/login", validateMiddleware(loginSchema), loginUser);
-router.post("/register", registerUser);
+router.post("/register", validateMiddleware(registrationSchema), registerUser);
 router.post(
   "/profile/:id/follow",
   passport.authenticate("jwt", { session: false }),
