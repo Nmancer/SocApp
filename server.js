@@ -8,9 +8,10 @@ const express = require("express"),
   app = express(),
   passport = require("passport"),
   errorMiddleware = require("./middleware/error"),
-  users = require("./routes/user"),
-  posts = require("./routes/post"),
-  comments = require("./routes/comment");
+  user = require("./routes/user"),
+  profile = require("./routes/profile"),
+  post = require("./routes/post"),
+  comment = require("./routes/comment");
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -36,10 +37,10 @@ mongoose
   .catch(err => console.log(err));
 app.use(passport.initialize());
 require("./config/passport")(passport);
-app.use("/api/users", users);
-app.use("/api/posts", posts);
-app.use("/api/comments", comments);
-// app.use("/api/profile", profile);
+app.use("/api/users", user);
+app.use("/api/posts", post);
+app.use("/api/comments", comment);
+app.use("/api/me", profile);
 
 //production mode
 // if (process.env.NODE_ENV === "production") {

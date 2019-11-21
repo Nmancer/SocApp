@@ -6,28 +6,30 @@ class UserService {
 
   async register(userDTO) {
     const user = await this.User.findOne({ email: userDTO.email });
-
     if (user) {
       throw new this.ErrorHandler(400, "User with that email already exists");
     }
-
     const constructedUser = new User(userDTO);
-
     const registeredUser = await constructedUser.save();
-
     return { registeredUser };
   }
 
   async login(userDTO) {
     const user = await this.User.findOne({ email: userDTO.email });
-
     if (!user || !(await user.comparePassword(userDTO.password))) {
       throw new this.ErrorHandler(401, "Incorrect credentials");
     }
-
     const { name, username, id, email } = user;
     const token = await user.signJwt({ name, username, id, email });
     return { token };
+  }
+
+  async findUserById(id) {
+    const user = await this.User.findById(id);
+    if (!user) {
+      throw new this.ErrorHandler(404, "User with that id does not exist");
+    }
+    return { user };
   }
 
   async listUsers(page, limit) {
@@ -37,25 +39,6 @@ class UserService {
     return { users };
   }
 
-  async getUser(email, password) {
-    return await this.User.findOne({ email, password });
-  }
-  async getUserByEmail(email) {
-    return await this.User.findOne({ email });
-  }
-  async getUserById(id) {
-    const user = await this.User.findById(id);
-    if (!user) {
-      throw new this.ErrorHandler(404, "User with that id does not exist");
-    }
-    return { user };
-  }
-
-  async saveUser(user) {
-    await user.save();
-    return user;
-  }
-
   async followUser(loggedUserId, targetUserId) {
     if (loggedUserId === targetUserId) {
       throw new this.ErrorHandler(
@@ -63,10 +46,8 @@ class UserService {
         "Logged and target user ids are the same"
       );
     }
-
     const targetUser = await User.findById(targetUserId);
     const loggedUser = await User.findById(loggedUserId);
-
     if (!targetUser) {
       throw new this.ErrorHandler(404, "User with that id does not exist");
     }
@@ -91,30 +72,9 @@ class UserService {
       );
       loggedUser.followeeCount = loggedUser.followeeCount - 1;
     }
-
     await targetUser.save();
     await loggedUser.save();
-
     return { targetUser, loggedUser };
-  }
-  async deleteUser(id) {
-    const user = await User.findById(id);
-    await user.remove();
-    return { user };
-  }
-  async editUser(id, userDTO) {
-    const user = await this.User.findByIdAndUpdate(id, userDTO, { new: true });
-
-    return { user };
-  }
-  async editUserPassword(id, passwordDTO) {
-    const user = await User.findById(id);
-    if (!(await user.comparePassword(passwordDTO.oldPassword))) {
-      throw new this.ErrorHandler(401, "Incorrect credentials");
-    }
-    user.password = passwordDTO.newPassword;
-    await user.save();
-    return { user };
   }
 }
 

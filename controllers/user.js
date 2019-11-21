@@ -32,7 +32,7 @@ const getAllUsers = asyncWrapper(async (req, res, next) => {
   sendSuccess(res, { users });
 });
 const getSingleUser = asyncWrapper(async (req, res, next) => {
-  const { user } = await userService.getUserById(req.params.id);
+  const { user } = await userService.findUserById(req.params.id);
 
   sendSuccess(res, { user });
 });
@@ -47,7 +47,7 @@ const editUser = asyncWrapper(async (req, res, next) => {
 const editUserPassword = asyncWrapper(async (req, res, next) => {
   const userDTO = req.body;
 
-  const { user } = await userService.editUserPassword(req.user.id, userDTO);
+  await userService.editUserPassword(req.user.id, userDTO);
 
   sendSuccess(res, { message: "Successfully changed password", success: true });
 });
