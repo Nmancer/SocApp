@@ -8,12 +8,32 @@ class PostService {
     const posts = await this.Post.find({})
       .limit(limit)
       .skip(page * limit)
-      .populate("author", ["username"]);
+      .sort({ createdAt: -1 })
+      .populate("author", ["username", "name", "avatar"]);
+    return { posts };
+  }
+  async searchPosts(titleQuery) {
+    const posts = await this.Post.find({
+      title: { $regex: titleQuery, $options: "i" }
+    })
+      .limit(20)
+      .sort({ createdAt: -1 })
+      .populate("author", ["username", "name", "avatar"]);
+    return { posts };
+  }
+
+  async listTrendingPosts() {
+    let today = new Date();
+    const sevenDaysAgo = today.setDate(today.getDate() - 7);
+    const posts = await this.Post.find({ createdAt: { $gte: sevenDaysAgo } })
+      .limit(20)
+      .sort({ likeCount: -1 })
+      .populate("author", ["username", "name", "avatar"]);
     return { posts };
   }
 
   async createPost(postDTO) {
-    const constructedPost = new Post(postDTO);
+    const constructedPost = new this.Post(postDTO);
 
     const savedPost = await constructedPost.save();
 
@@ -37,6 +57,7 @@ class PostService {
     }
     return { post };
   }
+
   async editPost(userId, postId, postDTO) {
     const post = await this.Post.findOneAndUpdate(
       { authorId: userId, _id: postId },

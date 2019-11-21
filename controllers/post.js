@@ -16,6 +16,17 @@ const getAllPosts = asyncWrapper(async (req, res, next) => {
 
   sendSuccess(res, { posts });
 });
+
+const getTrendingPosts = asyncWrapper(async (req, res, next) => {
+  const { posts } = await postService.listTrendingPosts();
+
+  sendSuccess(res, { posts });
+});
+const searchPosts = asyncWrapper(async (req, res, next) => {
+  const { posts } = await postService.searchPosts(req.params.titleQuery);
+
+  sendSuccess(res, { posts });
+});
 const createPost = asyncWrapper(async (req, res, next) => {
   const postDTO = { ...req.body, authorId: req.user.id };
 
@@ -46,6 +57,8 @@ const deletePost = asyncWrapper(async (req, res, next) => {
 module.exports = {
   getPost,
   getAllPosts,
+  getTrendingPosts,
+  searchPosts,
   createPost,
   editPost,
   deletePost,

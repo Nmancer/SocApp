@@ -16,11 +16,7 @@ const PostSchema = new Schema(
 
     authorId: { type: Schema.Types.ObjectId, ref: "users" },
     likes: [{ type: Schema.Types.ObjectId, ref: "users" }],
-    likeCount: { type: Number, default: 0 },
-    date: {
-      type: Date,
-      default: Date.now
-    }
+    likeCount: { type: Number, default: 0 }
   },
   { timestamps: true, id: false }
 );

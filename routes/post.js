@@ -2,7 +2,9 @@ const router = require("express").Router();
 const passport = require("passport");
 const {
   getPost,
+  getTrendingPosts,
   getAllPosts,
+  searchPosts,
   editPost,
   deletePost,
   createPost,
@@ -13,7 +15,8 @@ const { postSchema } = require("../utils/schemas");
 const validateMiddleware = require("../middleware/validation");
 
 router.get("/", getAllPosts);
-
+router.get("/trending", getTrendingPosts);
+router.get("/search/:titleQuery", searchPosts);
 router.get("/:id", getPost);
 
 router.post(
