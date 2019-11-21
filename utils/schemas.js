@@ -54,6 +54,33 @@ const schemas = {
       .min(6)
       .max(1000)
       .required()
+  }),
+  profileEditSchema: Joi.object().keys({
+    username: Joi.string()
+      .alphanum()
+      .min(3)
+      .max(30)
+      .required(),
+
+    name: Joi.string()
+      .alphanum()
+      .min(2)
+      .max(64)
+      .required(),
+    avatar: Joi.string()
+      .min(4)
+      .max(64)
+      .allow(""),
+
+    about: Joi.string()
+      .alphanum()
+      .min(2)
+      .max(150)
+      .allow("")
+  }),
+  passwordEditSchema: Joi.object().keys({
+    oldPassword: Joi.string().required(),
+    newPassword: Joi.string().required()
   })
 };
 

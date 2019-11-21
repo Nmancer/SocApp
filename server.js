@@ -7,12 +7,9 @@ const express = require("express"),
   path = require("path"),
   app = express(),
   passport = require("passport"),
-  errorMiddleware = require("./middleware/error");
-
-const users = require("./routes/user");
-// const posts = require("./routes/posts");
-// const comments = require("./routes/comments");
-// const profile = require("./routes/profile");
+  errorMiddleware = require("./middleware/error"),
+  users = require("./routes/user"),
+  posts = require("./routes/post");
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -39,7 +36,7 @@ mongoose
 app.use(passport.initialize());
 require("./config/passport")(passport);
 app.use("/api/users", users);
-// app.use("/api/posts", posts);
+app.use("/api/posts", posts);
 // app.use("/api/comments", comments);
 // app.use("/api/profile", profile);
 

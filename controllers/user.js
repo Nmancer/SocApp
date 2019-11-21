@@ -1,63 +1,81 @@
-const { User } = require("../models/");
 const { userService } = require("../services");
-const { ErrorHandler } = require("../utils/error");
-const { signWithJwt } = require("../utils/signJwt");
+
 const asyncWrapper = require("../utils/asyncWrapper");
-
+const sendSuccess = require("../utils/sendSuccess");
 const loginUser = asyncWrapper(async (req, res, next) => {
-  const { email, password } = req.body;
-  const user = await userService.getUserByEmail(email);
+  const userDTO = req.body;
+  const { token } = await userService.login(userDTO);
 
-  if (!user || !(await user.comparePassword(password))) {
-    throw new ErrorHandler(401, "Incorrect credentials");
-  }
-
-  const { name, username, id } = user;
-  const token = await signWithJwt(
-    { name, username, id, email },
-    process.env.JWTSECRET
-  );
-
-  res
-    .status(200)
-    .json({ message: "successfully authenticated", success: true, token });
+  sendSuccess(res, {
+    message: "Successfully authenticated",
+    success: true,
+    token
+  });
 });
 
 const registerUser = asyncWrapper(async (req, res, next) => {
-  const { email, password, name, username, avatar, about } = req.body;
-  const user = await userService.getUserByEmail(email);
+  const userDTO = req.body;
 
-  if (user) {
-    throw new ErrorHandler(400, "User with that email already exists");
-  }
-  const userToRegister = new User({
-    email,
-    password,
-    name,
-    username,
-    avatar,
-    about
-  });
-  const registeredUser = await userService.saveUser(userToRegister);
+  const { registeredUser } = await userService.register(userDTO);
 
-  res.status(200).json({
-    message: "successfully registered",
+  sendSuccess(res, {
+    message: "Successfully registered",
     success: true,
     user: registeredUser
   });
 });
 
-const getAllUsers = asyncWrapper(async (req, res, next) => {});
+const getAllUsers = asyncWrapper(async (req, res, next) => {
+  const page = parseInt(req.query.page) || 0;
+  const limit = parseInt(req.query.limit) || 15;
+  const { users } = await userService.listUsers(page, limit);
+  sendSuccess(res, { users });
+});
+const getSingleUser = asyncWrapper(async (req, res, next) => {
+  const { user } = await userService.getUserById(req.params.id);
 
-const getSingleUser = asyncWrapper(async (req, res, next) => {});
-const editUser = asyncWrapper(async (req, res, next) => {});
-const followUser = asyncWrapper(async (req, res, next) => {});
+  sendSuccess(res, { user });
+});
 
+const editUser = asyncWrapper(async (req, res, next) => {
+  const userDTO = req.body;
+
+  const { user } = await userService.editUser(req.user.id, userDTO);
+
+  sendSuccess(res, { user });
+});
+const editUserPassword = asyncWrapper(async (req, res, next) => {
+  const userDTO = req.body;
+
+  const { user } = await userService.editUserPassword(req.user.id, userDTO);
+
+  sendSuccess(res, { message: "Successfully changed password", success: true });
+});
+const followUser = asyncWrapper(async (req, res, next) => {
+  const { loggedUser, targetUser } = await userService.followUser(
+    req.user.id.toString(),
+    req.params.id.toString()
+  );
+
+  sendSuccess(res, { targetUser, loggedUser });
+});
+const deleteUser = asyncWrapper(async (req, res, next) => {
+  const { user } = await userService.deleteUser(req.user.id);
+
+  sendSuccess(res, { user });
+});
+
+const getLoggedUser = asyncWrapper(async (req, res, next) => {
+  sendSuccess(res, { user: req.user });
+});
 module.exports = {
   loginUser,
   registerUser,
   getAllUsers,
   getSingleUser,
+  getLoggedUser,
   editUser,
+  editUserPassword,
+  deleteUser,
   followUser
 };

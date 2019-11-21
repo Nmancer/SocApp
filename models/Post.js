@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
-
+const User = require("./User");
 const PostSchema = new Schema(
   {
     title: {
@@ -14,23 +14,30 @@ const PostSchema = new Schema(
       trim: true
     },
 
-    author: { type: Schema.Types.ObjectId, ref: "users" },
-
+    authorId: { type: Schema.Types.ObjectId, ref: "users" },
+    likes: [{ type: Schema.Types.ObjectId, ref: "users" }],
+    likeCount: { type: Number, default: 0 },
     date: {
       type: Date,
       default: Date.now
     }
   },
-  { timestamps: true }
+  { timestamps: true, id: false }
 );
 
 PostSchema.set("toObject", { virtuals: true });
 PostSchema.set("toJSON", { virtuals: true });
+PostSchema.methods.toJSON = function() {
+  const userObject = this.toObject();
 
-// PostSchema.virtual("comments", {
-//   ref: "comments",
-//   localField: "_id",
-//   foreignField: "post"
-// });
+  delete userObject.__v;
+  return userObject;
+};
+PostSchema.virtual("author", {
+  ref: "users",
+  localField: "authorId",
+  foreignField: "_id",
+  justOne: true
+});
 
 module.exports = Post = mongoose.model("posts", PostSchema);

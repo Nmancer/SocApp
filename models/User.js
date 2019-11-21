@@ -1,70 +1,59 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 const bcrypt = require("bcryptjs");
+const { signWithJwt } = require("../utils/signJwt");
 const Post = require("./Post");
-const UserSchema = new Schema(
-  {
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      trim: true,
-      lowercase: true
-    },
-    password: {
-      type: String,
-      required: true,
-      trim: true
-    },
-    name: {
-      type: String,
-      required: true,
-      trim: true,
-      lowercase: true
-    },
-
-    username: {
-      type: String,
-      required: true,
-      trim: true
-    },
-    avatar: {
-      type: String,
-      trim: true,
-      lowercase: true
-    },
-    about: {
-      type: String,
-      trim: true
-    },
-    followers: {
-      usersFollowing: [{ type: Schema.Types.ObjectId, ref: "users" }],
-      count: {
-        type: Number,
-        default: 0
-      }
-    },
-    following: {
-      usersFollowed: [{ type: Schema.Types.ObjectId, ref: "users" }],
-      count: {
-        type: Number,
-        default: 0
-      }
-    },
-    date: {
-      type: Date,
-      default: Date.now
-    }
+const UserSchema = new Schema({
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+    lowercase: true
   },
-  { timestamps: true }
-);
+  password: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  name: {
+    type: String,
+    required: true,
+    trim: true,
+    lowercase: true
+  },
+
+  username: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  avatar: {
+    type: String,
+    trim: true,
+    lowercase: true
+  },
+  about: {
+    type: String,
+    trim: true
+  },
+  followers: [{ type: Schema.Types.ObjectId, ref: "users" }],
+  followerCount: {
+    type: Number,
+    default: 0
+  },
+  following: [{ type: Schema.Types.ObjectId, ref: "users" }],
+  followeeCount: {
+    type: Number,
+    default: 0
+  },
+  date: {
+    type: Date,
+    default: Date.now()
+  }
+});
 UserSchema.set("toObject", { virtuals: true });
 UserSchema.set("toJSON", { virtuals: true });
-// UserSchema.virtual("posts", {
-//   ref: "posts",
-//   localField: "_id",
-//   foreignField: "author"
-// });
 
 UserSchema.methods.toJSON = function() {
   const userObject = this.toObject();
@@ -73,15 +62,12 @@ UserSchema.methods.toJSON = function() {
   return userObject;
 };
 
-UserSchema.methods.comparePassword = async function(candidatePassword, cb) {
-  try {
-    const isMatch = await bcrypt.compare(candidatePassword, this.password);
-    return null, isMatch;
-  } catch (error) {
-    cb(isMatch);
-  }
+UserSchema.methods.comparePassword = async function(candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
 };
-
+UserSchema.methods.signJwt = async function(userData) {
+  return await signWithJwt(userData, process.env.JWTSECRET);
+};
 UserSchema.pre("save", async function(next) {
   if (this.isModified("password")) {
     this.password = await bcrypt.hash(this.password, 8);

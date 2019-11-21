@@ -5,14 +5,37 @@ const {
   getAllPosts,
   editPost,
   deletePost,
-  createPost
+  createPost,
+  likePost
 } = require("../controllers").PostController;
+
+const { postSchema } = require("../utils/schemas");
+const validateMiddleware = require("../middleware/validation");
+
 router.get("/", getAllPosts);
+
 router.get("/:id", getPost);
 
-router.post("/", passport.authenticate("jwt", { session: false }), createPost);
+router.post(
+  "/",
+  passport.authenticate("jwt", { session: false }),
+  validateMiddleware(postSchema),
+  createPost
+);
 
-router.put("/:id", passport.authenticate("jwt", { session: false }), editPost);
+router.post(
+  "/like/:id",
+  passport.authenticate("jwt", { session: false }),
+
+  likePost
+);
+router.patch(
+  "/:id",
+  passport.authenticate("jwt", { session: false }),
+  validateMiddleware(postSchema),
+  editPost
+);
+
 router.delete(
   "/:id",
   passport.authenticate("jwt", { session: false }),
