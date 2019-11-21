@@ -5,6 +5,7 @@ const express = require("express"),
   rateLimit = require("express-rate-limit"),
   helmet = require("helmet"),
   path = require("path"),
+  cloudinary = require("cloudinary"),
   app = express(),
   passport = require("passport"),
   errorMiddleware = require("./middleware/error"),
@@ -19,6 +20,12 @@ const limiter = rateLimit({
 });
 
 app.enable("trust proxy");
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_KEY,
+  api_secret: process.env.CLOUDINARY_SECRET
+});
 
 app.use(express.static(path.join(__dirname, "client/build")));
 
@@ -35,6 +42,9 @@ mongoose
   })
   .then(() => console.log("Mongo  Connected"))
   .catch(err => console.log(err));
+
+require("./config/cloudinary");
+
 app.use(passport.initialize());
 require("./config/passport")(passport);
 app.use("/api/users", user);

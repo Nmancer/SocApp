@@ -19,10 +19,6 @@ const schemas = {
       .min(2)
       .max(64)
       .required(),
-    avatar: Joi.string()
-      .min(4)
-      .max(64)
-      .allow(""),
 
     about: Joi.string()
       .alphanum()
@@ -67,10 +63,6 @@ const schemas = {
       .min(2)
       .max(64)
       .required(),
-    avatar: Joi.string()
-      .min(4)
-      .max(64)
-      .allow(""),
 
     about: Joi.string()
       .alphanum()

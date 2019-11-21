@@ -1,10 +1,13 @@
 const router = require("express").Router();
 const passport = require("passport");
+const parser = require("../config/cloudinary");
+
 const {
   getLoggedUser,
   editUser,
   editUserPassword,
-  deleteUser
+  deleteUser,
+  uploadAvatar
 } = require("../controllers").ProfileController;
 
 const { profileEditSchema, passwordEditSchema } = require("../utils/schemas");
@@ -24,6 +27,7 @@ router.patch(
   validateMiddleware(profileEditSchema),
   editUser
 );
+
 router.patch(
   "/password",
   passport.authenticate("jwt", {
@@ -32,6 +36,13 @@ router.patch(
   validateMiddleware(passwordEditSchema),
   editUserPassword
 );
+router.post(
+  "/avatar",
+  passport.authenticate("jwt", { session: false }),
+  parser.single("image"),
+  uploadAvatar
+);
+
 router.delete(
   "/",
   passport.authenticate("jwt", {

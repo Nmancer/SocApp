@@ -4,10 +4,9 @@ class ProfileService {
     this.ErrorHandler = ErrorHandler;
   }
 
-  async deleteUser(id) {
-    const user = await User.findById(id);
-    await user.remove();
-    return { user };
+  async deleteUser(loggedUser) {
+    await loggedUser.remove();
+    return { loggedUser };
   }
   async editUser(id, userDTO) {
     const user = await this.User.findByIdAndUpdate(id, userDTO, { new: true });
@@ -21,6 +20,13 @@ class ProfileService {
     user.password = passwordDTO.newPassword;
     await user.save();
     return { user };
+  }
+  async uploadAvatar(loggedUser, image) {
+    loggedUser.avatar.imageUrl = image.url;
+    loggedUser.avatar.imageId = image.id;
+
+    await loggedUser.save();
+    return { uploadedImage: image };
   }
 }
 

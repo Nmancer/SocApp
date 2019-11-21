@@ -29,9 +29,12 @@ const UserSchema = new Schema({
     trim: true
   },
   avatar: {
-    type: String,
-    trim: true,
-    lowercase: true
+    imageUrl: {
+      type: String
+    },
+    imageId: {
+      type: String
+    }
   },
   about: {
     type: String,

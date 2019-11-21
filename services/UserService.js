@@ -66,7 +66,6 @@ class UserService {
     } else {
       targetUser.followers.splice(isAlreadyFollowerIndex, 1);
       targetUser.followerCount = targetUser.followerCount - 1;
-
       loggedUser.following = loggedUser.following.filter(
         followeeId => followeeId.toString() !== targetUserId
       );
