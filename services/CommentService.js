@@ -1,6 +1,7 @@
 class CommentService {
-  constructor(Comment, ErrorHandler) {
+  constructor(Comment, Post, ErrorHandler) {
     this.Comment = Comment;
+    this.Post = Post;
     this.ErrorHandler = ErrorHandler;
   }
 
@@ -8,15 +9,16 @@ class CommentService {
     const comments = await this.Comment.find({ postId })
       .limit(limit)
       .skip(page * limit)
-      .populate("author", ["username"]);
+      .populate("author", ["username,name,avatar"]);
     return { comments };
   }
 
   async createComment(commentDTO) {
+    if (!(await Post.findById(commentDTO.postId))) {
+      throw new this.ErrorHandler(404, "Post with that id does not exist ");
+    }
     const constructedComment = new this.Comment(commentDTO);
-
     const savedComment = await constructedComment.save();
-
     return { comment: savedComment };
   }
 

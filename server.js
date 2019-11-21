@@ -9,7 +9,8 @@ const express = require("express"),
   passport = require("passport"),
   errorMiddleware = require("./middleware/error"),
   users = require("./routes/user"),
-  posts = require("./routes/post");
+  posts = require("./routes/post"),
+  comments = require("./routes/comment");
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -37,7 +38,7 @@ app.use(passport.initialize());
 require("./config/passport")(passport);
 app.use("/api/users", users);
 app.use("/api/posts", posts);
-// app.use("/api/comments", comments);
+app.use("/api/comments", comments);
 // app.use("/api/profile", profile);
 
 //production mode

@@ -20,7 +20,18 @@ class PostService {
     return { post: savedPost };
   }
   async showPost(id) {
-    const post = await this.Post.findById(id).populate("author");
+    const post = await this.Post.findById(id)
+      .populate("author")
+      .populate({
+        path: "commentsOwned",
+        select: ["date", "text", "authorId"],
+        populate: {
+          path: "author",
+          select: ["username", "avatar", "name"]
+        }
+      })
+      .exec();
+
     if (!post) {
       throw new this.ErrorHandler(404, "Post with that id does not exist");
     }

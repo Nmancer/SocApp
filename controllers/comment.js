@@ -21,7 +21,11 @@ const getAllCommentsByPost = asyncWrapper(async (req, res, next) => {
   sendSuccess(res, { comments });
 });
 const createComment = asyncWrapper(async (req, res, next) => {
-  const commentDTO = { ...req.body, authorId: req.user.id };
+  const commentDTO = {
+    ...req.body,
+    authorId: req.user.id,
+    postId: req.params.postId
+  };
 
   const { comment } = await commentService.createComment(commentDTO);
   sendSuccess(res, { comment });
@@ -31,7 +35,7 @@ const editComment = asyncWrapper(async (req, res, next) => {
 
   const { comment } = await commentService.editComment(
     req.user.id,
-    req.params.id,
+    req.params.commentId,
     commentDTO
   );
   sendSuccess(res, { comment });
@@ -39,9 +43,9 @@ const editComment = asyncWrapper(async (req, res, next) => {
 const deleteComment = asyncWrapper(async (req, res, next) => {
   const { comment } = await commentService.deleteComment(
     req.user.id,
-    req.params.id
+    req.params.commentId
   );
-  sendSuccess(res, { post });
+  sendSuccess(res, { comment });
 });
 
 module.exports = {

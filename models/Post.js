@@ -39,5 +39,9 @@ PostSchema.virtual("author", {
   foreignField: "_id",
   justOne: true
 });
-
+PostSchema.virtual("commentsOwned", {
+  ref: "comments",
+  localField: "_id",
+  foreignField: "postId"
+});
 module.exports = Post = mongoose.model("posts", PostSchema);
