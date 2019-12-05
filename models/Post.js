@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
-const User = require("./User");
 const PostSchema = new Schema(
   {
     title: {
@@ -25,7 +24,6 @@ PostSchema.set("toObject", { virtuals: true });
 PostSchema.set("toJSON", { virtuals: true });
 PostSchema.methods.toJSON = function() {
   const userObject = this.toObject();
-
   delete userObject.__v;
   return userObject;
 };
@@ -40,4 +38,5 @@ PostSchema.virtual("commentsOwned", {
   localField: "_id",
   foreignField: "postId"
 });
+
 module.exports = Post = mongoose.model("posts", PostSchema);

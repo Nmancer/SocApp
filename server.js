@@ -64,13 +64,7 @@ app.use("/api/me", profile);
 // app.get("*", (req, res) => {
 //   res.sendFile(path.join(__dirname + "/client/public/index.html"));
 // });
-// app.use((error, req, res, next) => {
-//   if (error.joi) {
-//     return res.status(400).json({ error: error.joi.message });
-//   }
 
-//   return res.status(500).send(error);
-// });
 app.use(errorMiddleware);
 
 app.listen(process.env.PORT, () => `Server started on ${process.env.PORT}`);

@@ -15,9 +15,7 @@ const loginUser = asyncWrapper(async (req, res, next) => {
 
 const registerUser = asyncWrapper(async (req, res, next) => {
   const userDTO = req.body;
-
   const { registeredUser } = await userService.register(userDTO);
-
   sendSuccess(res, {
     message: "Successfully registered",
     success: true,

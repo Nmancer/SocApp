@@ -39,8 +39,8 @@ class PostService {
 
     return { post: savedPost };
   }
-  async showPost(id) {
-    const post = await this.Post.findById(id)
+  async showPost(postId) {
+    const post = await this.Post.findById(postId)
       .populate("author")
       .populate({
         path: "commentsOwned",
@@ -51,10 +51,10 @@ class PostService {
         }
       })
       .exec();
-
-    if (!post) {
-      throw new this.ErrorHandler(404, "Post with that id does not exist");
-    }
+    if (post.isOwner())
+      if (!post) {
+        throw new this.ErrorHandler(404, "Post with that id does not exist");
+      }
     return { post };
   }
 
