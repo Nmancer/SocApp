@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 const bcrypt = require("bcryptjs");
+const randtoken = require("rand-token");
+
 const { signWithJwt } = require("../utils/signJwt");
 const Post = require("./Post");
 const UserSchema = new Schema({
@@ -36,6 +38,11 @@ const UserSchema = new Schema({
       type: String
     }
   },
+  role: {
+    type: String,
+    enum: ["Admin", "Member"],
+    default: "Member"
+  },
   about: {
     type: String,
     trim: true
@@ -45,6 +52,7 @@ const UserSchema = new Schema({
     type: Number,
     default: 0
   },
+  refreshToken: { type: String },
   following: [{ type: Schema.Types.ObjectId, ref: "users" }],
   followeeCount: {
     type: Number,
@@ -62,12 +70,18 @@ UserSchema.methods.toJSON = function() {
   const userObject = this.toObject();
   delete userObject.password;
   delete userObject.__v;
+
   return userObject;
 };
 
 UserSchema.methods.comparePassword = async function(candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
+
+UserSchema.methods.generateRefreshToken = async function(userData) {
+  return randtoken.uid(256);
+};
+
 UserSchema.methods.signJwt = async function(userData) {
   return await signWithJwt(userData, process.env.JWTSECRET);
 };
@@ -79,7 +93,6 @@ UserSchema.pre("save", async function(next) {
 });
 UserSchema.pre("remove", async function(next) {
   await Post.deleteMany({ author: this._id });
-
   next();
 });
 

@@ -16,11 +16,15 @@ const loginUser = asyncWrapper(async (req, res, next) => {
 const registerUser = asyncWrapper(async (req, res, next) => {
   const userDTO = req.body;
   const { registeredUser } = await userService.register(userDTO);
-  sendSuccess(res, {
-    message: "Successfully registered",
-    success: true,
-    user: registeredUser
-  });
+  sendSuccess(
+    res,
+    {
+      message: "Successfully registered",
+      success: true,
+      user: registeredUser
+    },
+    201
+  );
 });
 
 const getAllUsers = asyncWrapper(async (req, res, next) => {
@@ -66,6 +70,29 @@ const deleteUser = asyncWrapper(async (req, res, next) => {
 const getLoggedUser = asyncWrapper(async (req, res, next) => {
   sendSuccess(res, { user: req.user });
 });
+
+// need email and token from request
+
+const issueToken = asyncWrapper(async (req, res, next) => {
+  const token = await userService.issueToken(req.body);
+
+  sendSuccess(res, {
+    success: true,
+    message: "Token has been successfully issued!",
+    token
+  });
+});
+
+const rejectToken = asyncWrapper(async (req, res, next) => {
+  // if(req.user.status==='admin'){}
+  await userService.rejectToken(req.body);
+
+  sendSuccess(res, {
+    success: true,
+    message: "Token has been successfully revoked!"
+  });
+});
+
 module.exports = {
   loginUser,
   registerUser,
@@ -75,5 +102,7 @@ module.exports = {
   editUser,
   editUserPassword,
   deleteUser,
-  followUser
+  followUser,
+  rejectToken,
+  issueToken
 };

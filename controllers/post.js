@@ -31,7 +31,7 @@ const createPost = asyncWrapper(async (req, res, next) => {
   const postDTO = { ...req.body, authorId: req.user.id };
 
   const { post } = await postService.createPost(postDTO);
-  sendSuccess(res, { post });
+  sendSuccess(res, { post }, 201);
 });
 
 const likePost = asyncWrapper(async (req, res, next) => {

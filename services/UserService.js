@@ -17,11 +17,47 @@ class UserService {
   async login(userDTO) {
     const user = await this.User.findOne({ email: userDTO.email });
     if (!user || !(await user.comparePassword(userDTO.password))) {
-      throw new this.ErrorHandler(401, "Incorrect credentials");
+      throw new this.ErrorHandler(
+        401,
+        "Unauthorized: Access to this resource is  denied due to invalid credentials."
+      );
     }
     const { name, username, id, email } = user;
     const token = await user.signJwt({ name, username, id, email });
     return { token };
+  }
+
+  async issueToken(userDTO) {
+    const user = await this.User.findOne({
+      email: userDTO.email,
+      refreshToken: userDTO.refreshToken
+    });
+    if (!user) {
+      throw new this.ErrorHandler(
+        401,
+        "Unauthorized: Access to this resource is  denied due to invalid credentials."
+      );
+    }
+    const { name, username, id, email } = user;
+    const token = await user.signJwt({ name, username, id, email });
+    return { token };
+  }
+
+  async rejectToken(userDTO) {
+    const user = await this.User.findOne({
+      email: userDTO.email,
+      refreshToken: userDTO.refreshToken
+    });
+    if (!user) {
+      throw new this.ErrorHandler(
+        401,
+        "Unauthorized: Access to this resource is  denied due to invalid credentials."
+      );
+    }
+
+    user.refreshToken = null;
+    await user.save();
+    return true;
   }
 
   async findUserById(id) {

@@ -28,7 +28,7 @@ const createComment = asyncWrapper(async (req, res, next) => {
   };
 
   const { comment } = await commentService.createComment(commentDTO);
-  sendSuccess(res, { comment });
+  sendSuccess(res, { comment }, 201);
 });
 const editComment = asyncWrapper(async (req, res, next) => {
   const commentDTO = req.body;
